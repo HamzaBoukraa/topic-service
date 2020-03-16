@@ -30,7 +30,7 @@ def get_learning_objects_without_topic():
         },
     })
 
-    es_response = requests.post('http://localhost:9200/learning-objects/_search', data=body, headers={'Content-Type': 'application/json'})
+    es_response = requests.post('http://elasticsearch:9200/learning-objects/_search', data=body, headers={'Content-Type': 'application/json'})
 
     learning_object_es_documents = json.loads(es_response.text)['hits']['hits']
 
