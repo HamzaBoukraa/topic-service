@@ -67,39 +67,29 @@ def determine_learning_object_placements(learning_objects):
         # and the number of occurrences for
         # that index
         index_count = {}
-        most_fequent_index = -1
-        highest_occurence_rate = 0
-        most_frequent_scores = []
-
         for high_score in highest_scores:
-
             if highest_scores[high_score].get('index') in index_count:
-
                 index_count[highest_scores[high_score].get('index')] += 1
-
-                if index_count[highest_scores[high_score].get('index')] > highest_occurence_rate:
-                    # If a new high value was discovered, reset the frequent scores array
-                    most_frequent_scores = []
-                    highest_occurence_rate = index_count[highest_scores[high_score].get('index')]
-                    most_fequent_index = highest_scores[high_score].get('index')
-
-                most_frequent_scores.append(highest_scores[high_score].get('score_as_percent'))   
-
             else:
-
                 index_count[highest_scores[high_score].get('index')] = 1
 
-                if index_count[highest_scores[high_score].get('index')] > highest_occurence_rate:
-                    # If a new high value was discovered, reset the frequent scores array
-                    most_frequent_scores = []
-                    highest_occurence_rate = index_count[highest_scores[high_score].get('index')]
-                    most_fequent_index = highest_scores[high_score].get('index')
-                    
-                most_frequent_scores.append(highest_scores[high_score].get('score_as_percent'))
+        most_fequent_index = -1 
+        highest_occurence_rate = 0
+        for index in index_count:
+            if index_count.get(index) > highest_occurence_rate:
+                highest_occurence_rate = index_count.get(index)
+                most_fequent_index = index
+        
+        most_frequent_scores = []
+        for high_score in highest_scores:
+            if highest_scores[high_score].get('index') == most_fequent_index:
+                most_frequent_scores.append( highest_scores[high_score].get('score_as_percent'))
 
         # If highest_occurence_rate is less than or equal to 1,
         # set the topic id for this Learning Object to -1, indicating
         # that it belongs in its own topic
+        print(highest_occurence_rate)
+        print(most_frequent_scores)
         if highest_occurence_rate <= 1:
             most_fequent_index = -1
         # If the highest_occurence_rate is greater than 1,
