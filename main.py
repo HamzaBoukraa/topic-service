@@ -28,20 +28,25 @@ def predictTopicsForNewLearningObjects():
     predicted_learning_object_placements = determine_learning_object_placements(learning_objects_without_topic)
 
     new_topic_learning_objects = []
-    standard_topic_learning_objects = []
-    for learning_objeect_cuid in predicted_learning_object_placements:
-        if predicted_learning_object_placements.get(learning_objeect_cuid) == -1:
-            new_topic_learning_objects.append(learning_objeect_cuid)
+    standard_topic_learning_objects = {}
+    
+    for learning_object_cuid in predicted_learning_object_placements:
+        if predicted_learning_object_placements.get(learning_object_cuid).get('topic_id') == -1:
+            new_topic_learning_objects.append({'cuid': learning_object_cuid, 'version': predicted_learning_object_placements[learning_object_cuid].get('version'), 'name': predicted_learning_object_placements[learning_object_cuid].get('name'), 'author': predicted_learning_object_placements[learning_object_cuid].get('author') })
         else:
-            standard_topic_learning_objects.append(learning_objeect_cuid)
+            if predicted_learning_object_placements.get(learning_object_cuid).get('topic_id') in standard_topic_learning_objects:
+                standard_topic_learning_objects[predicted_learning_object_placements.get(learning_object_cuid).get('topic_id')].append({'cuid': learning_object_cuid, 'version': predicted_learning_object_placements[learning_object_cuid].get('version'), 'name': predicted_learning_object_placements[learning_object_cuid].get('name'), 'author': predicted_learning_object_placements[learning_object_cuid].get('author') })
+            else:
+                standard_topic_learning_objects[predicted_learning_object_placements.get(learning_object_cuid).get('topic_id')] = [{'cuid': learning_object_cuid, 'version': predicted_learning_object_placements[learning_object_cuid].get('version'), 'name': predicted_learning_object_placements[learning_object_cuid].get('name'), 'author': predicted_learning_object_placements[learning_object_cuid].get('author') }]
 
-    generate_new_topics(new_topic_learning_objects)
+    new_topic_learning_objects = generate_new_topics(new_topic_learning_objects)
+
     # Each of these Learning Objects are then passed through
     # a cluster of classification models. Each model will return
     # an array probabilities, indicating a confidence that the
     # speficied Learning Object belongs in a topic.
 
-    return jsonify({'message': predicted_learning_object_placements}), 200
+    return jsonify({'standard_topics': standard_topic_learning_objects, 'new_topics': new_topic_learning_objects }), 200
 
 
 if __name__ == '__main__':

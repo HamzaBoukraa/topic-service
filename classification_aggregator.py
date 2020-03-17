@@ -88,8 +88,6 @@ def determine_learning_object_placements(learning_objects):
         # If highest_occurence_rate is less than or equal to 1,
         # set the topic id for this Learning Object to -1, indicating
         # that it belongs in its own topic
-        print(highest_occurence_rate)
-        print(most_frequent_scores)
         if highest_occurence_rate <= 1:
             most_fequent_index = -1
         # If the highest_occurence_rate is greater than 1,
@@ -107,7 +105,7 @@ def determine_learning_object_placements(learning_objects):
             if avg < 20:
                 most_fequent_index = -1
 
-        output[learning_object.get('cuid')] = most_fequent_index
+        output[learning_object.get('cuid')] = { 'topic_id': most_fequent_index, 'version': learning_object.get('version'), 'name': learning_object.get('name'), 'author': learning_object.get('author') }
             
     return output
 
