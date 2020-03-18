@@ -10,17 +10,15 @@ import pandas as pd
 import numpy as np
 
 app = Flask(__name__)
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app, resources={r'/*': {'origins': 'http://localhost:4200' }}, supports_credentials=True)
 
 topics = ['Adversarial Thinking', 'SCADA', ' Networking and network security in the cloud', 'Strategic Thinking', 'NICE Challenges', 'Authenticating passwords', 'Secure Design with focus on IoT', 'CSEC Essentials roadmap', 'Modules on principles, networks, software vulnerabilities, development and acq. of secure software', 'Security networking; Systems and tools in security, and Adv. Security concepts', 'IoT security and privacy', 'Cyber Ethics, Cyber Security I and II, Scripting for automation and security, Wireless system admin., Digital Forensics', 'Industrial Control Systems', 'SCADA  Concept Maps ', 'Concept Maps for 3 courses', 'Cybersecurity 1 & 2, Networks, Software, Privacy, Crypto', 'Risk Management', 'Privacy', 'Competency-based curriculum', 'Software Security and Secure Programming', 'Digital Forensics, Secure Coding and Ethical Pen-testing, Cybersecurity and Digital Ethics ', 'Cybersecurity Principles course and modules on risk, mobile risk, software testing, ICS, LTE, and HCI', ' Introducing Active Learning to Malware Analysis Curriculum', 'Secure Software Development, Secure Programming, Op Sys Hardware, Network Defense', 'Modules for learning side-channel attacks and defenses on smartphones', 'Modules and labs for stepping-stone intrusion detection techniques', 'Content development of Reverse Engineering, Software Exp. & Security, Malware Analysis; K12 Ed Content; CTF, Framework Design', 'Basic and advanced topics in IoT Forensics', 'Education on laws, regulations and policies', 'Multidisciplinary (economics, psychology, and cybersecurity) approach to evaluate human threats and design systems for the desired human-computer interactions', 'Infrastructure Service Admin and Security, Advanced Network Security, Penetration Testing and Audit, Cybersecurity for Industrial Control Systems', 'Wireless/mobile and cyber threats and vulnerabilities', 'Quantum Cryptography Laboratories', 'Reverse engineering of modern malware', 'Intro to Cyber Security and Cloud Security', 'Android application vulnerabilities and mitigation ', 'Blockchain and Cybersecurity', 'Principles of Cyber Operation and Cyber Operations Law and Policy', 'Secure Programming Concept Inventory', 'Cybersecurity Legal and Ethical Aspects / Adversarial Thinking - 1 week module using behavorial game theory', 'Labs for Cryptographic Engineering on Modern Systems', 'Visualization tools and labs, Cross-Site Scripting and Cross-site Request Forgery, DNS cache poisoning and pharming, Logic Flaw, Ad Fraud, IoT Botnet, Browser Extensions', 'Threats/vuln., risk mgmt, software reverse eng., cryptography', 'Prototype Curriculum Management System (CLARK)', 'Software Reverse Engineering']
 
 @app.route('/')
-@cross_origin()
 def index():
     return jsonify({'message': 'Welcome to the Clark Topic Service'}), 200
 
 @app.route('/topics/assign')
-@cross_origin()
 def predictTopicsForNewLearningObjects():
     # Finds all Learning Objects that do not have a topic
     learning_objects_without_topic = get_learning_objects_without_topic()
@@ -50,6 +48,12 @@ def predictTopicsForNewLearningObjects():
 
     return jsonify({'standard_topics': standard_topic_learning_objects, 'new_topics': new_topic_learning_objects }), 200
 
+@app.route('/learning-objects/unassigned')
+def getUnassignedLearningObjects():
+    # Finds all Learning Objects that do not have a topic
+    learning_objects_without_topic = get_learning_objects_without_topic()
+
+    return jsonify({'unassigned_learning_objects': learning_objects_without_topic }), 200
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5001)
