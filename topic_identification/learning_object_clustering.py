@@ -39,7 +39,7 @@ def generate_new_topics(learning_objects):
     tfidf = models.TfidfModel(bow_corpus)
     corpus_tfidf = tfidf[bow_corpus]
 
-    lda_model_tfidf = gensim.models.LdaMulticore(corpus_tfidf, num_topics=50, id2word=dictionary, passes=20, workers=4)
+    lda_model_tfidf = gensim.models.LdaMulticore(corpus_tfidf, num_topics=20, id2word=dictionary, passes=20, workers=4)
 
     corpus = lda_model_tfidf[corpus_tfidf]
 

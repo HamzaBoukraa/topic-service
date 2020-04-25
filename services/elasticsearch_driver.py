@@ -2,6 +2,8 @@ import requests
 import json
 import os
 
+import elasticsearch
+
 def get_learning_objects_without_topic():
     body = json.dumps({
         "size": 1000, 
@@ -44,18 +46,18 @@ def get_learning_objects_without_topic():
 
     return learning_objects
 
-def assign_topic_name():
-    for learning_object in learning_objects:
-        learning_object_name = learning_object.get('name')
+def assign_topic_name(learning_object_id, topic_name):
+    es = elasticsearch.Elasticsearch(hosts=[{'host': os.environ.get('ELASTICSEARCH_DOMAIN'), 'port': os.environ.get('ELASTICSEARCH_PORT') }])
 
-        query_body = {
-            "query": {
-                "match": {
-                    "id": learning_object.get("_id")
-                }
+    query_body = {
+        "query": {
+            "match": {
+                "id": learning_object_id
             }
         }
-        doc = es.search(index="learning-objects", body=query_body)
-        res = es.update(index="learning-objects", doc_type="_doc", id=doc['hits']['hits'][0]['_id'], body={'doc': {'topic': sorted_topics[i].lower()}})
+    }
+    doc = es.search(index="learning-objects", body=query_body)
+    res = es.update(index="learning-objects", doc_type="_doc", id=doc['hits']['hits'][0]['_id'], body={ 'doc': { 'topic': topic_name }})
+            
 
 

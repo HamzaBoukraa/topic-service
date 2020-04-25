@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from services.elasticsearch_driver import get_learning_objects_without_topic
+from services.elasticsearch_driver import get_learning_objects_without_topic, assign_topic_name
 from services.mongodb_driver import get_all_topic_names, update_topic_name_list
 from topic_identification.learning_object_classification import determine_learning_object_placements
 from topic_identification.learning_object_clustering import generate_new_topics
@@ -41,7 +41,7 @@ def TopicPredictionController(app):
         return jsonify({'standard_topics': standard_topic_learning_objects, 'new_topics': new_topic_learning_objects }), 200
 
 
-    @app.route('/topics/assign', methods=['POST'])
+    @app.route('/topics/assign/update', methods=['POST'])
     def assignNewTopics():
         req_data = request.get_json()
 
@@ -66,10 +66,16 @@ def TopicPredictionController(app):
         update_topic_name_list(topic_names)
 
         # Update each Learning Object topic label
-
+        for topic_name in new_topic_names:
+            for learning_object in req_data[topic_name]:
+                if learning_object.get('id') is not None:
+                    id = learning_object.get('id')
+                else:
+                    id = learning_object.get('_id')
+                assign_topic_name(id, topic_name)
 
         # Invoke Pipeline (CodeBuild)
         invoke_model_training_job()
 
-        # return jsonify({'topic_names': topic_names }), 200
+        return jsonify({'topic_names': topic_names }), 200
 

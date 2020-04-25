@@ -9,3 +9,4 @@ boto3
 PyJWT==1.4.0
 pytest
 python-dotenv
+elasticsearch
