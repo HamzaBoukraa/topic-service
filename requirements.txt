@@ -1,7 +1,11 @@
 flask
 flask_cors
 nltk
-keras
-tensorflow
+keras==2.3.1
+tensorflow==2.1.0
 pymongo
 gensim
+boto3
+PyJWT==1.4.0
+pytest
+python-dotenv
