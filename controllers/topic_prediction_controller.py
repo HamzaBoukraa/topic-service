@@ -4,11 +4,26 @@ from services.mongodb_driver import get_all_topic_names, update_topic_name_list
 from topic_identification.learning_object_classification import determine_learning_object_placements
 from topic_identification.learning_object_clustering import generate_new_topics
 from services.codebuild_driver import invoke_model_training_job
+from controllers.auth import decode_authorization_jwt
+from controllers.constants import HTTP_OK_CODE, HTTP_FORBIDDEN_CODE, HTTP_UNAUTHORIZED_CODE, HTTP_UNAUTHORIZED_MESSAGE, HTTP_FORBIDDEN_MESSAGE
+
 
 def TopicPredictionController(app):
 
     @app.route('/topics/assign', methods=['GET'])
     def predictTopicsForNewLearningObjects():
+
+        decoded_token = decode_authorization_jwt(request.headers.get( 'Authorization' ))
+
+        if decoded_token is None:
+
+            return jsonify({ 'message': HTTP_UNAUTHORIZED_MESSAGE }), HTTP_UNAUTHORIZED_CODE
+
+        requester_access_groups = decoded_token.get('accessGroups')
+
+        if requester_access_groups is None or 'admin' not in requester_access_groups:
+
+            return jsonify({ 'message': HTTP_FORBIDDEN_MESSAGE }), HTTP_FORBIDDEN_CODE
 
         topics = get_all_topic_names()
         
@@ -43,6 +58,19 @@ def TopicPredictionController(app):
 
     @app.route('/topics/assign/update', methods=['POST'])
     def assignNewTopics():
+        
+        decoded_token = decode_authorization_jwt(request.headers.get( 'Authorization' ))
+
+        if decoded_token is None:
+
+            return jsonify({ 'message': HTTP_UNAUTHORIZED_MESSAGE }), HTTP_UNAUTHORIZED_CODE
+
+        requester_access_groups = decoded_token.get('accessGroups')
+
+        if requester_access_groups is None or 'admin' not in requester_access_groups:
+
+            return jsonify({ 'message': HTTP_FORBIDDEN_MESSAGE }), HTTP_FORBIDDEN_CODE
+
         req_data = request.get_json()
 
         # Get list of topic names 

@@ -1,0 +1,41 @@
+defaults: &defaults
+  working_directory: ~/topic-service
+  docker:
+    - image: cyber4all/circleci-aws:docker-git
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Image
+          command: | 
+            docker build -t topic-service:$CIRCLE_SHA1 .
+      - run:
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Publish Image 
+          command: |
+            docker tag topic-service:$CIRCLE_SHA1 "${DOCKER_USER_ORG}/topic-service:${CIRCLE_SHA1}"
+            docker push "${DOCKER_USER_ORG}/topic-service:${CIRCLE_SHA1}"
+            
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /master/
+
+  build-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /master/
+  
+   
