@@ -24,6 +24,7 @@ jobs:
   deploy:
     <<: *defaults
     steps:
+      - checkout
       - run:
           name: Deploy to ECS
           command: |
