@@ -21,7 +21,15 @@ jobs:
           command: |
             docker tag topic-service:$CIRCLE_SHA1 "${DOCKER_USER_ORG}/topic-service:${CIRCLE_SHA1}"
             docker push "${DOCKER_USER_ORG}/topic-service:${CIRCLE_SHA1}"
-            
+  deploy:
+    <<: *defaults
+    steps:
+      - run:
+          name: Deploy to ECS
+          command: |
+            export DOCKER_IMAGE="${DOCKER_USER_ORG}/topic-service:${CIRCLE_SHA1}"
+            chmod +x ./deploy.sh
+            sh ./deploy.sh
 workflows:
   version: 2
   build:
@@ -37,5 +45,10 @@ workflows:
           filters:
             branches:
               only: /master/
-  
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: /master/
    
