@@ -17,7 +17,7 @@ def TopicBrowseController(app):
 
         requester_access_groups = decoded_token.get('accessGroups')
 
-        if requester_access_groups is None or 'admin' not in requester_access_groups:
+        if requester_access_groups is None or 'admin' not in requester_access_groups or 'editor' not in requester_access_groups:
 
             return jsonify({ 'message': HTTP_FORBIDDEN_MESSAGE }), HTTP_FORBIDDEN_CODE
     

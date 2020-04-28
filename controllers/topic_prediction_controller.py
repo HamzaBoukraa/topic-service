@@ -21,7 +21,7 @@ def TopicPredictionController(app):
 
         requester_access_groups = decoded_token.get('accessGroups')
 
-        if requester_access_groups is None or 'admin' not in requester_access_groups:
+        if requester_access_groups is None or 'admin' not in requester_access_groups or 'editor' not in requester_access_groups:
 
             return jsonify({ 'message': HTTP_FORBIDDEN_MESSAGE }), HTTP_FORBIDDEN_CODE
 
@@ -56,9 +56,16 @@ def TopicPredictionController(app):
         return jsonify({'standard_topics': standard_topic_learning_objects, 'new_topics': new_topic_learning_objects }), 200
 
 
+    # The body for this route should follow the format
+    # {
+    #   <topic name> : LearningObject[],
+    #   <topic name> : LearningObject[],
+    #   <topic name> : LearningObject[]
+    #   ...
+    # }
     @app.route('/topics/assign/update', methods=['POST'])
     def assignNewTopics():
-        
+
         decoded_token = decode_authorization_jwt(request.headers.get( 'Authorization' ))
 
         if decoded_token is None:
@@ -67,7 +74,7 @@ def TopicPredictionController(app):
 
         requester_access_groups = decoded_token.get('accessGroups')
 
-        if requester_access_groups is None or 'admin' not in requester_access_groups:
+        if requester_access_groups is None or 'admin' not in requester_access_groups or 'editor' not in requester_access_groups:
 
             return jsonify({ 'message': HTTP_FORBIDDEN_MESSAGE }), HTTP_FORBIDDEN_CODE
 
