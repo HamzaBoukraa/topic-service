@@ -43,6 +43,8 @@ def generate_new_topics(learning_objects):
 
     corpus = lda_model_tfidf[corpus_tfidf]
 
+    # Create dictionary where each key is a topic and each
+    # value is an array of descriptions that belong within that topic
     topic_id_dict = {}
     for i, bow_item in enumerate(bow_corpus):
 
@@ -60,7 +62,9 @@ def generate_new_topics(learning_objects):
         else:
             topic_id_dict[id_for_max] = [learning_object_descriptions[i]]
 
-    
+
+    # Map each description to a Learning Object
+    # Maintain the same dictionary structure
     topic_to_cuid_dict = {}
 
     for key in topic_id_dict:
@@ -74,16 +78,26 @@ def generate_new_topics(learning_objects):
                     else:
                         topic_to_cuid_dict[key] = [learning_object]
 
+
+    # Locate each given Learning Object 
+    # and move them into a new dictionary,
+    # while still maintaining their positions
     out = {}
+    used_topics = {}
+    used_cuids = []
     for index, topic in enumerate(topic_to_cuid_dict):
         for learning_object in topic_to_cuid_dict.get(topic):
             for given_learning_object in learning_objects:
                 if given_learning_object.get('learning_object').get('cuid') == learning_object.get('cuid'):
-                    topic_name = str(uuid.uuid4())
-                    if topic_name in out:
-                        out[topic_name].append(learning_object)
-                    else:
-                        out[topic_name] = [learning_object]
+                    if given_learning_object.get('learning_object').get('cuid') not in used_cuids:
+                        used_cuids.append(given_learning_object.get('learning_object').get('cuid'))
+                        if topic in used_topics:
+                            topic_name = used_topics.get(topic)
+                            out[topic_name].append(learning_object)
+                        else:
+                            topic_name = str(uuid.uuid4())
+                            used_topics[topic] = topic_name
+                            out[topic_name] = [learning_object]
     return out
 
 def lemmatize_stemming(text):
